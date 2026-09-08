@@ -36,6 +36,10 @@ import {
   Coins,
   Send,
   UserCog,
+  Sun,
+  Moon,
+  LogOut,
+  User,
 } from 'lucide-react';
 import { BrandTheme, StudentUser, Course, DiscountCode, StaffAccount } from '../../types';
 import { COURSES } from '../../data/mockData';
@@ -47,6 +51,9 @@ export interface AdminPageProps {
   currentUser?: StudentUser | null;
   onPreviewCourse?: (course: Course) => void;
   onNavigateHome?: () => void;
+  onToggleTheme?: () => void;
+  onLogout?: () => void;
+  onNavigateProfile?: () => void;
 }
 
 interface AdminCourseRow {
@@ -160,6 +167,9 @@ export default function AdminDashboardPage({
   currentUser,
   onPreviewCourse,
   onNavigateHome,
+  onToggleTheme,
+  onLogout,
+  onNavigateProfile,
 }: AdminPageProps) {
   const colors = getThemeColors(currentTheme);
 
@@ -491,9 +501,107 @@ export default function AdminDashboardPage({
   };
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] dark:bg-[#1C1712] text-[#1C1712] dark:text-[#FFF9EF] pb-24" dir="rtl">
+    <div
+      className="min-h-screen transition-colors duration-300 pb-24"
+      dir="rtl"
+      style={{
+        backgroundColor: colors.canvasBg,
+        color: colors.textPrimary,
+      }}
+    >
+      {/* ===================== ADMIN TOP HEADER BAR ===================== */}
+      <header
+        className="border-b sticky top-0 z-50 transition-colors shadow-xs"
+        style={{
+          backgroundColor: currentTheme === 'dark' ? '#1C1712' : '#F7EFE4',
+          borderColor: colors.borderColor,
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-3 flex items-center justify-between gap-4">
+          {/* Right side: Logo & Title */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onNavigateHome}
+              className="flex items-center gap-2.5 text-right cursor-pointer hover:opacity-90 transition-opacity"
+            >
+              <div className="w-10 h-10 rounded-2xl bg-amber-400 text-neutral-950 font-black flex items-center justify-center text-lg shadow-sm">
+                ن
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-camel text-base sm:text-lg font-black" style={{ color: colors.textPrimary }}>
+                    أكاديمية نوح
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30">
+                    لوحة تحكم الإدارة 🛡️
+                  </span>
+                </div>
+              </div>
+            </button>
+          </div>
+
+          {/* Left side (Top Right in RTL): Actions (Theme, Profile, Logout) */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Icon-Only Theme Switcher */}
+            {onToggleTheme && (
+              <button
+                onClick={onToggleTheme}
+                className="p-2.5 rounded-full border shadow-xs transition-transform hover:scale-105 cursor-pointer flex items-center justify-center min-w-[40px] min-h-[40px]"
+                style={{
+                  backgroundColor: currentTheme === 'dark' ? '#2A1F17' : '#EFE4D0',
+                  borderColor: colors.borderColor,
+                  color: currentTheme === 'dark' ? '#FDE047' : colors.primary,
+                }}
+                aria-label="تبديل النمط اللوني"
+                title={currentTheme === 'dark' ? 'التحويل للنمط النهاري' : 'التحويل للنمط الليلي'}
+              >
+                {currentTheme === 'dark' ? (
+                  <Sun className="w-4 h-4 text-amber-400" />
+                ) : (
+                  <Moon className="w-4 h-4 text-[#3A3028]" />
+                )}
+              </button>
+            )}
+
+            {/* Profile Button */}
+            {onNavigateProfile && (
+              <button
+                onClick={onNavigateProfile}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-full border font-bold text-xs shadow-xs transition-all hover:scale-105 cursor-pointer"
+                style={{
+                  backgroundColor: currentTheme === 'dark' ? '#2A1F17' : '#FFFFFF',
+                  borderColor: colors.borderColor,
+                  color: colors.textPrimary,
+                }}
+                title="الملف الشخصي للمدير"
+              >
+                <div className="w-5 h-5 rounded-full bg-amber-400 text-neutral-950 font-black text-[11px] flex items-center justify-center">
+                  {currentUser?.fullName?.charAt(0) || 'م'}
+                </div>
+                <span className="hidden sm:inline font-ui">{currentUser?.fullName || 'الملف الشخصي'}</span>
+                <span className="sm:hidden font-ui">الملف</span>
+              </button>
+            )}
+
+            {/* Direct Logout Button */}
+            {onLogout && (
+              <button
+                onClick={() => {
+                  onLogout();
+                }}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-full border border-rose-500/40 text-rose-500 hover:bg-rose-500 hover:text-white transition-colors text-xs font-bold font-ui cursor-pointer min-h-[40px]"
+                title="تسجيل الخروج"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">تسجيل الخروج</span>
+              </button>
+            )}
+          </div>
+        </div>
+      </header>
+
       {/* Role Switching Simulator Header Bar */}
-      <div className="bg-[#2A1F17] text-[#FFF9EF] py-2.5 px-4 sm:px-8 border-b border-amber-900/40 shadow-sm sticky top-0 z-50">
+      <div className="bg-[#2A1F17] text-[#FFF9EF] py-2.5 px-4 sm:px-8 border-b border-amber-900/40 shadow-sm sticky top-[61px] z-40">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
           <div className="flex items-center gap-2 font-bold">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />

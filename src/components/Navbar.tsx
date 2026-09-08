@@ -21,6 +21,7 @@ import {
   UserPlus,
   ShoppingCart,
   GraduationCap,
+  LogOut,
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -38,6 +39,7 @@ interface NavbarProps {
   currentPage?: string;
   onNavigatePage?: (page: string, params?: any) => void;
   cartCount?: number;
+  onLogout?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -55,6 +57,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   currentPage = 'home',
   onNavigatePage,
   cartCount = 0,
+  onLogout,
 }) => {
   const [activeLink, setActiveLink] = useState<'home' | 'about' | 'courses' | 'packages'>('home');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -281,62 +284,23 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </button>
 
-            {/* Desktop Theme Switcher */}
-            <div
-              id="desktop-theme-switcher"
-              className="hidden md:flex items-center p-1 rounded-full border shadow-inner transition-all bg-black/5 dark:bg-black/20 min-h-[44px]"
-              style={{
-                borderColor: colors.borderColor,
-              }}
-            >
-              {/* Warm Earth */}
-              <button
-                onClick={() => handleSelectTheme('warm-earth')}
-                className={`px-3.5 py-1.5 rounded-full text-[11px] font-bold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
-                  currentTheme === 'warm-earth'
-                    ? 'bg-[#3A3028] text-[#FFF9EF] shadow-xs'
-                    : 'text-neutral-500 hover:text-neutral-900 dark:text-[#E8D9C0] dark:hover:text-[#FFF9EF]'
-                }`}
-                title="نمط أرضي / Warm Earth"
-              >
-                <Sun className="w-3.5 h-3.5 text-amber-500" />
-                <span>أرضي (نهاري)</span>
-              </button>
-
-              {/* Dark Mode */}
-              <button
-                onClick={() => handleSelectTheme('dark')}
-                className={`px-3.5 py-1.5 rounded-full text-[11px] font-bold transition-all flex items-center gap-1.5 cursor-pointer min-h-[36px] ${
-                  currentTheme === 'dark'
-                    ? 'bg-[#D6C3A3] text-[#1C1712] shadow-xs'
-                    : 'text-neutral-500 hover:text-neutral-900 dark:text-[#E8D9C0] dark:hover:text-[#FFF9EF]'
-                }`}
-                title="نمط داكن / Dark Mode"
-              >
-                <Moon className="w-3.5 h-3.5 text-amber-400" />
-                <span>داكن (ليلي)</span>
-              </button>
-            </div>
-
-            {/* Mobile Theme Quick Toggle Icon (44x44px touch target) */}
+            {/* Icon-Only Theme Switcher Button */}
             <button
-              id="mobile-theme-toggle"
+              id="theme-toggle-button"
               onClick={onToggleTheme}
-              className="md:hidden p-2.5 rounded-full border shadow-xs transition-colors flex items-center justify-center cursor-pointer min-w-[44px] min-h-[44px]"
+              className="p-2.5 rounded-full border shadow-xs transition-transform hover:scale-105 cursor-pointer flex items-center justify-center min-w-[44px] min-h-[44px]"
               style={{
-                backgroundColor: currentTheme === 'dark' ? '#1E293B' : currentTheme === 'fresh' ? '#F9FADE' : '#EFE4D0',
+                backgroundColor: currentTheme === 'dark' ? '#1E293B' : '#EFE4D0',
                 borderColor: colors.borderColor,
-                color: currentTheme === 'dark' ? '#38BDF8' : colors.primary,
+                color: currentTheme === 'dark' ? '#FDE047' : colors.primary,
               }}
               aria-label="تبديل النمط اللوني"
-              title={`النمط الحالي: ${currentTheme === 'dark' ? 'ليلي' : currentTheme === 'fresh' ? 'طازج' : 'أرضي'}`}
+              title={currentTheme === 'dark' ? 'التحويل للنمط النهاري' : 'التحويل للنمط الليلي'}
             >
               {currentTheme === 'dark' ? (
-                <Moon className="w-4 h-4 text-sky-400" />
-              ) : currentTheme === 'fresh' ? (
-                <Flame className="w-4 h-4 text-[#6F384F]" />
+                <Sun className="w-5 h-5 text-amber-400" />
               ) : (
-                <Sun className="w-4 h-4 text-[#3A3028]" />
+                <Moon className="w-5 h-5 text-[#3A3028]" />
               )}
             </button>
 
@@ -347,28 +311,45 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <button
                     id="admin-portal-button"
                     onClick={onOpenAdmin}
-                    className="px-2.5 sm:px-3 py-2 rounded-full text-xs font-bold bg-neutral-900 text-amber-400 border border-neutral-700 hover:bg-neutral-800 transition-colors flex items-center gap-1 cursor-pointer min-h-[44px]"
+                    className="px-2.5 sm:px-3 py-2 rounded-full text-xs font-bold bg-neutral-900 text-amber-400 border border-neutral-700 hover:bg-neutral-800 transition-colors flex items-center gap-1.5 cursor-pointer min-h-[44px]"
                     title="لوحة تحكم الإدارة"
                   >
                     <ShieldCheck className="w-4 h-4 text-amber-400" />
-                    <span className="hidden sm:inline">الإدارة</span>
+                    <span className="hidden sm:inline">لوحة الإدارة</span>
                   </button>
                 )}
                 <button
                   id="student-dashboard-button"
                   onClick={onOpenDashboard}
-                  className="flex items-center gap-1 sm:gap-1.5 px-3 sm:px-4 py-2 rounded-full font-bold text-xs sm:text-sm shadow transition-transform hover:scale-105 cursor-pointer text-white truncate max-w-[120px] xs:max-w-[150px] sm:max-w-none min-h-[44px]"
+                  className="flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-full font-bold text-xs sm:text-sm shadow transition-transform hover:scale-105 cursor-pointer text-white truncate max-w-[140px] sm:max-w-none min-h-[44px]"
                   style={{
                     backgroundColor: currentTheme === 'dark' ? '#0284C7' : colors.primary,
                   }}
+                  title="الملف الشخصي"
                 >
-                  <User className="w-3.5 sm:w-4 h-3.5 sm:h-4 text-amber-300 shrink-0" />
-                  <span className="hidden sm:inline truncate">{currentUser.fullName.split(' ')[0]}</span>
-                  <span className="sm:hidden text-xs truncate">حسابي</span>
-                  <span className="bg-amber-400 text-neutral-900 text-[10px] px-1.5 py-0.2 rounded-full font-bold shrink-0">
-                    {currentUser.points}
-                  </span>
+                  <User className="w-4 h-4 text-amber-300 shrink-0" />
+                  <span className="truncate">{currentUser.fullName.split(' ')[0]}</span>
+                  {currentUser.role === 'admin' ? (
+                    <span className="bg-amber-400 text-neutral-900 text-[10px] px-1.5 py-0.5 rounded-full font-black shrink-0">
+                      مشرف
+                    </span>
+                  ) : (
+                    <span className="bg-amber-400 text-neutral-900 text-[10px] px-1.5 py-0.2 rounded-full font-bold shrink-0">
+                      {currentUser.points}
+                    </span>
+                  )}
                 </button>
+
+                {onLogout && (
+                  <button
+                    onClick={onLogout}
+                    className="p-2.5 rounded-full border border-rose-500/30 text-rose-500 hover:bg-rose-500 hover:text-white transition-colors cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
+                    title="تسجيل الخروج"
+                    aria-label="تسجيل الخروج"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                )}
               </div>
             ) : (
               <div className="flex items-center gap-1 sm:gap-2">
@@ -546,35 +527,39 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               </div>
 
-              {/* Theme Selector Section (min 44px touch targets) */}
+              {/* Theme Selector Section (Icon-only without titles, min 44px touch targets) */}
               <div className="py-3 border-b" style={{ borderColor: colors.borderColor }}>
-                <div className="text-xs font-bold text-neutral-600 dark:text-[#E8D9C0] mb-2">
-                  النمط والمظهر (Theme Switcher):
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => handleSelectTheme('warm-earth')}
-                    className={`min-h-[44px] py-2 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border transition-all cursor-pointer ${
-                      currentTheme === 'warm-earth'
-                        ? 'bg-[#3A3028] text-[#FFF9EF] border-[#3A3028] shadow-sm'
-                        : 'bg-white/60 dark:bg-black/30 text-neutral-800 dark:text-[#E8D9C0] border-neutral-200 dark:border-neutral-800'
-                    }`}
-                  >
-                    <Sun className="w-4 h-4 text-amber-500" />
-                    <span>أرضي (نهاري)</span>
-                  </button>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-neutral-600 dark:text-[#E8D9C0]">
+                    المظهر (Theme):
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleSelectTheme('warm-earth')}
+                      className={`min-h-[44px] min-w-[44px] p-2 rounded-xl flex items-center justify-center border transition-all cursor-pointer ${
+                        currentTheme === 'warm-earth'
+                          ? 'bg-[#3A3028] text-[#FFF9EF] border-[#3A3028] shadow-sm'
+                          : 'bg-white/60 dark:bg-black/30 text-neutral-800 dark:text-[#E8D9C0] border-neutral-200 dark:border-neutral-800'
+                      }`}
+                      title="نمط أرضي"
+                      aria-label="نمط أرضي"
+                    >
+                      <Sun className="w-5 h-5 text-amber-500" />
+                    </button>
 
-                  <button
-                    onClick={() => handleSelectTheme('dark')}
-                    className={`min-h-[44px] py-2 px-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border transition-all cursor-pointer ${
-                      currentTheme === 'dark'
-                        ? 'bg-[#D6C3A3] text-[#1C1712] border-[#D6C3A3] shadow-sm'
-                        : 'bg-white/60 dark:bg-black/30 text-neutral-800 dark:text-[#E8D9C0] border-neutral-200 dark:border-neutral-800'
-                    }`}
-                  >
-                    <Moon className="w-4 h-4 text-amber-400" />
-                    <span>داكن (ليلي)</span>
-                  </button>
+                    <button
+                      onClick={() => handleSelectTheme('dark')}
+                      className={`min-h-[44px] min-w-[44px] p-2 rounded-xl flex items-center justify-center border transition-all cursor-pointer ${
+                        currentTheme === 'dark'
+                          ? 'bg-[#D6C3A3] text-[#1C1712] border-[#D6C3A3] shadow-sm'
+                          : 'bg-white/60 dark:bg-black/30 text-neutral-800 dark:text-[#E8D9C0] border-neutral-200 dark:border-neutral-800'
+                      }`}
+                      title="نمط داكن"
+                      aria-label="نمط داكن"
+                    >
+                      <Moon className="w-5 h-5 text-amber-400" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -618,7 +603,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     }}
                   >
                     <User className="w-4 h-4 text-amber-300" />
-                    <span>لوحة متابعة الطالب ({currentUser.fullName})</span>
+                    <span>الملف الشخصي ({currentUser.fullName})</span>
                   </button>
                   {currentUser.role === 'admin' && onOpenAdmin && (
                     <button
@@ -629,7 +614,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                       className="w-full min-h-[44px] py-2 rounded-xl font-bold text-xs bg-neutral-900 text-amber-400 border border-neutral-700 text-center flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <ShieldCheck className="w-4 h-4 text-amber-400" />
-                      <span>بوابة إدارة النظام والتحكم</span>
+                      <span>لوحة تحكم الإدارة</span>
+                    </button>
+                  )}
+                  {onLogout && (
+                    <button
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        onLogout();
+                      }}
+                      className="w-full min-h-[44px] py-2 rounded-xl font-bold text-xs bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30 text-center flex items-center justify-center gap-1.5 cursor-pointer hover:bg-rose-500 hover:text-white transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>تسجيل الخروج</span>
                     </button>
                   )}
                 </div>

@@ -130,10 +130,14 @@ export default function StudentProfilePage({
       track: 'computing_engineering',
       enrolledCourseIds: ['c1', 'c2', 'c3'],
       points: 480,
+      role: 'admin',
     }
   );
 
-  const [activeTab, setActiveTab] = useState<'learning' | 'certificates' | 'settings'>('learning');
+  const isAdmin = user.role === 'admin';
+  const [activeTab, setActiveTab] = useState<'learning' | 'certificates' | 'settings' | 'admin_overview'>(
+    isAdmin ? 'admin_overview' : 'learning'
+  );
   const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
   const [selectedCertForModal, setSelectedCertForModal] = useState<CertificateItem | null>(null);
   const [notificationToast, setNotificationToast] = useState<string | null>(null);
@@ -255,9 +259,16 @@ export default function StudentProfilePage({
                 <h1 className="font-camel text-xl sm:text-2xl font-black text-neutral-900 dark:text-slate-100">
                   {user.fullName}
                 </h1>
-                <span className="text-xs font-bold px-3 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30">
-                  طالب متميز 🎓
-                </span>
+                {isAdmin ? (
+                  <span className="text-xs font-bold px-3 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>مدير النظام العام (Super Admin)</span>
+                  </span>
+                ) : (
+                  <span className="text-xs font-bold px-3 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                    طالب متميز 🎓
+                  </span>
+                )}
               </div>
 
               <div className="flex flex-wrap items-center gap-4 text-xs font-ui text-neutral-500 dark:text-slate-400">
@@ -271,93 +282,275 @@ export default function StudentProfilePage({
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-neutral-400" />
-                  عضو منذ: سبتمبر 2025
+                  عضو منذ: 2024
                 </span>
               </div>
 
-              <div className="mt-2.5 flex flex-wrap items-center gap-2 text-xs font-ui font-semibold">
-                <span className="px-2.5 py-0.5 rounded-md bg-sky-500/15 text-sky-600 dark:text-sky-400">
-                  الصف الثالث الثانوي
-                </span>
-                <span className="px-2.5 py-0.5 rounded-md bg-purple-500/15 text-purple-600 dark:text-purple-400">
-                  مسار الحوسبة والهندسة
-                </span>
-              </div>
+              {isAdmin ? (
+                <div className="mt-2.5 flex flex-wrap items-center gap-2 text-xs font-ui font-semibold">
+                  <span className="px-2.5 py-0.5 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300">
+                    الرتبة: مدير تنفيذي للمنصة
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300">
+                    الصلاحيات: تحكم إداري كامل (Full Access)
+                  </span>
+                </div>
+              ) : (
+                <div className="mt-2.5 flex flex-wrap items-center gap-2 text-xs font-ui font-semibold">
+                  <span className="px-2.5 py-0.5 rounded-md bg-sky-500/15 text-sky-600 dark:text-sky-400">
+                    الصف الثالث الثانوي
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-md bg-purple-500/15 text-purple-600 dark:text-purple-400">
+                    مسار الحوسبة والهندسة
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
           {/* Quick Metrics / Points & Edit Button */}
           <div className="flex flex-row md:flex-col items-center md:items-end justify-between w-full md:w-auto gap-4 pt-4 md:pt-0 border-t md:border-t-0" style={{ borderColor: colors.borderColor }}>
             <div className="flex items-center gap-3">
-              <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-400/30 text-center min-w-24">
-                <span className="font-impact text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 block">
-                  {user.points}
-                </span>
-                <span className="font-ui text-[10px] text-neutral-500 dark:text-slate-400 font-bold">
-                  نقطة تفاعل (XP)
-                </span>
-              </div>
+              {isAdmin ? (
+                <>
+                  <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-400/30 text-center min-w-24">
+                    <span className="font-impact text-base sm:text-lg font-black text-amber-600 dark:text-amber-400 block">
+                      مدير عام
+                    </span>
+                    <span className="font-ui text-[10px] text-neutral-500 dark:text-slate-400 font-bold">
+                      بوابة الإدارة
+                    </span>
+                  </div>
 
-              <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-400/30 text-center min-w-24">
-                <span className="font-impact text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 block">
-                  {enrolledProgressList.length}
-                </span>
-                <span className="font-ui text-[10px] text-neutral-500 dark:text-slate-400 font-bold">
-                  كورسات مسجلة
-                </span>
-              </div>
+                  <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-400/30 text-center min-w-24">
+                    <span className="font-impact text-base sm:text-lg font-black text-emerald-600 dark:text-emerald-400 block">
+                      نشط 100%
+                    </span>
+                    <span className="font-ui text-[10px] text-neutral-500 dark:text-slate-400 font-bold">
+                      حالة الصلاحية
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-400/30 text-center min-w-24">
+                    <span className="font-impact text-xl sm:text-2xl font-black text-amber-600 dark:text-amber-400 block">
+                      {user.points}
+                    </span>
+                    <span className="font-ui text-[10px] text-neutral-500 dark:text-slate-400 font-bold">
+                      نقطة تفاعل (XP)
+                    </span>
+                  </div>
+
+                  <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-400/30 text-center min-w-24">
+                    <span className="font-impact text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400 block">
+                      {enrolledProgressList.length}
+                    </span>
+                    <span className="font-ui text-[10px] text-neutral-500 dark:text-slate-400 font-bold">
+                      كورسات مسجلة
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
 
-            <button
-              onClick={() => setIsEditProfileOpen(true)}
-              className="px-4 py-2 rounded-full border text-xs font-bold font-ui hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex items-center gap-1.5 cursor-pointer"
-              style={{ borderColor: colors.borderColor }}
-            >
-              <Edit className="w-3.5 h-3.5 text-amber-500" />
-              <span>تعديل الملف الشخصي</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsEditProfileOpen(true)}
+                className="px-4 py-2 rounded-full border text-xs font-bold font-ui hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex items-center gap-1.5 cursor-pointer"
+                style={{ borderColor: colors.borderColor }}
+              >
+                <Edit className="w-3.5 h-3.5 text-amber-500" />
+                <span>تعديل البيانات</span>
+              </button>
+              {onLogout && (
+                <button
+                  onClick={() => {
+                    onLogout();
+                    if (onNavigateHome) onNavigateHome();
+                  }}
+                  className="px-3 py-2 rounded-full border border-rose-500/40 text-rose-500 hover:bg-rose-500 hover:text-white transition-colors text-xs font-bold font-ui flex items-center gap-1 cursor-pointer"
+                  title="تسجيل الخروج"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>خروج</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
       {/* ===================== TAB NAVIGATION BAR ===================== */}
       <div className="flex items-center gap-2 pb-4 mb-6 border-b font-ui text-xs sm:text-sm font-bold overflow-x-auto scrollbar-none" style={{ borderColor: colors.borderColor }}>
-        <button
-          onClick={() => setActiveTab('learning')}
-          className={`px-4 sm:px-6 py-2.5 rounded-full transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
-            activeTab === 'learning'
-              ? 'bg-neutral-900 text-white dark:bg-sky-500 dark:text-slate-950 shadow-xs'
-              : 'hover:bg-black/5 dark:hover:bg-white/5 text-neutral-600 dark:text-slate-400'
-          }`}
-        >
-          <BookOpen className="w-4 h-4" />
-          <span>مقرراتي ودراستي ({enrolledProgressList.length})</span>
-        </button>
+        {isAdmin ? (
+          <>
+            <button
+              onClick={() => setActiveTab('admin_overview')}
+              className={`px-4 sm:px-6 py-2.5 rounded-full transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+                activeTab === 'admin_overview'
+                  ? 'bg-neutral-900 text-white dark:bg-amber-400 dark:text-neutral-950 shadow-xs'
+                  : 'hover:bg-black/5 dark:hover:bg-white/5 text-neutral-600 dark:text-slate-400'
+              }`}
+            >
+              <ShieldCheck className="w-4 h-4 text-amber-400" />
+              <span>الصلاحيات ولوحة الإدارة</span>
+            </button>
 
-        <button
-          onClick={() => setActiveTab('certificates')}
-          className={`px-4 sm:px-6 py-2.5 rounded-full transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
-            activeTab === 'certificates'
-              ? 'bg-neutral-900 text-white dark:bg-sky-500 dark:text-slate-950 shadow-xs'
-              : 'hover:bg-black/5 dark:hover:bg-white/5 text-neutral-600 dark:text-slate-400'
-          }`}
-        >
-          <Award className="w-4 h-4 text-amber-400" />
-          <span>الشهادات والأوسمة ({CERTIFICATES.length})</span>
-        </button>
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`px-4 sm:px-6 py-2.5 rounded-full transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+                activeTab === 'settings'
+                  ? 'bg-neutral-900 text-white dark:bg-amber-400 dark:text-neutral-950 shadow-xs'
+                  : 'hover:bg-black/5 dark:hover:bg-white/5 text-neutral-600 dark:text-slate-400'
+              }`}
+            >
+              <Settings className="w-4 h-4" />
+              <span>إعدادات الحساب والأمان</span>
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => setActiveTab('learning')}
+              className={`px-4 sm:px-6 py-2.5 rounded-full transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+                activeTab === 'learning'
+                  ? 'bg-neutral-900 text-white dark:bg-sky-500 dark:text-slate-950 shadow-xs'
+                  : 'hover:bg-black/5 dark:hover:bg-white/5 text-neutral-600 dark:text-slate-400'
+              }`}
+            >
+              <BookOpen className="w-4 h-4" />
+              <span>مقرراتي ودراستي ({enrolledProgressList.length})</span>
+            </button>
 
-        <button
-          onClick={() => setActiveTab('settings')}
-          className={`px-4 sm:px-6 py-2.5 rounded-full transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
-            activeTab === 'settings'
-              ? 'bg-neutral-900 text-white dark:bg-sky-500 dark:text-slate-950 shadow-xs'
-              : 'hover:bg-black/5 dark:hover:bg-white/5 text-neutral-600 dark:text-slate-400'
-          }`}
-        >
-          <Settings className="w-4 h-4" />
-          <span>إعدادات الحساب والأمان</span>
-        </button>
+            <button
+              onClick={() => setActiveTab('certificates')}
+              className={`px-4 sm:px-6 py-2.5 rounded-full transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+                activeTab === 'certificates'
+                  ? 'bg-neutral-900 text-white dark:bg-sky-500 dark:text-slate-950 shadow-xs'
+                  : 'hover:bg-black/5 dark:hover:bg-white/5 text-neutral-600 dark:text-slate-400'
+              }`}
+            >
+              <Award className="w-4 h-4 text-amber-400" />
+              <span>الشهادات والأوسمة ({CERTIFICATES.length})</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`px-4 sm:px-6 py-2.5 rounded-full transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+                activeTab === 'settings'
+                  ? 'bg-neutral-900 text-white dark:bg-sky-500 dark:text-slate-950 shadow-xs'
+                  : 'hover:bg-black/5 dark:hover:bg-white/5 text-neutral-600 dark:text-slate-400'
+              }`}
+            >
+              <Settings className="w-4 h-4" />
+              <span>إعدادات الحساب والأمان</span>
+            </button>
+          </>
+        )}
       </div>
+
+      {/* ===================== ADMIN OVERVIEW TAB ===================== */}
+      {isAdmin && activeTab === 'admin_overview' && (
+        <div className="space-y-6">
+          <div
+            className="p-6 sm:p-8 rounded-3xl border shadow-xs"
+            style={{
+              backgroundColor: colors.cardBg,
+              borderColor: colors.borderColor,
+            }}
+          >
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b mb-6" style={{ borderColor: colors.borderColor }}>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
+                  <ShieldCheck className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="font-camel text-lg sm:text-xl font-black text-neutral-900 dark:text-slate-100">
+                    بوابة الإدارة العامة والتحكم المركزي
+                  </h2>
+                  <p className="text-xs font-ui text-neutral-500 dark:text-slate-400 mt-0.5">
+                    حسابك يملك أعلى رتبة إدارية مع صلاحيات كاملة لإدارة المنصة والكادر التعليمي والمقررات
+                  </p>
+                </div>
+              </div>
+
+              {onNavigateHome && (
+                <button
+                  onClick={onNavigateHome}
+                  className="px-6 py-3 rounded-full bg-amber-400 hover:bg-amber-300 text-neutral-950 font-black text-xs sm:text-sm font-ui shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <span>الدخول إلى لوحة تحكم الإدارة</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Admin Capabilities Bento Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 font-ui text-xs">
+              <div className="p-4 rounded-2xl bg-black/2 dark:bg-white/2 border" style={{ borderColor: colors.borderColor }}>
+                <div className="font-bold text-neutral-900 dark:text-slate-100 text-sm mb-1 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                  إدارة الكورسات والمحاضرات
+                </div>
+                <p className="text-neutral-500 dark:text-slate-400 leading-relaxed">
+                  إضافة وتعديل وحذف المقررات، رفع المحاضرات ومذكرات الـ PDF، وتحديد الأسعار والمسارات الأكاديمية.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-black/2 dark:bg-white/2 border" style={{ borderColor: colors.borderColor }}>
+                <div className="font-bold text-neutral-900 dark:text-slate-100 text-sm mb-1 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-amber-500" />
+                  توزيع أرباح المعلمين (70% - 30%)
+                </div>
+                <p className="text-neutral-500 dark:text-slate-400 leading-relaxed">
+                  حساب نسب أرباح المعلمين تلقائياً وصرف المستحقات مع تقارير مالية تفصيلية لكل معلم.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-black/2 dark:bg-white/2 border" style={{ borderColor: colors.borderColor }}>
+                <div className="font-bold text-neutral-900 dark:text-slate-100 text-sm mb-1 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-sky-500" />
+                  إدارة وتوليد أكواد الخصم
+                </div>
+                <p className="text-neutral-500 dark:text-slate-400 leading-relaxed">
+                  إنشاء كوبونات الخصم بنسب مئوية أو مبالغ ثابتة مع تحديد صلاحية الاستخدام وربطها بالمعلمين.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-black/2 dark:bg-white/2 border" style={{ borderColor: colors.borderColor }}>
+                <div className="font-bold text-neutral-900 dark:text-slate-100 text-sm mb-1 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-purple-500" />
+                  صلاحيات المعلمين والمساعدين (RBAC)
+                </div>
+                <p className="text-neutral-500 dark:text-slate-400 leading-relaxed">
+                  تعيين حسابات المعلمين وإسناد المساعدين لكل معلم مع عزل تام للبيانات المالية عن المساعدين.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-black/2 dark:bg-white/2 border" style={{ borderColor: colors.borderColor }}>
+                <div className="font-bold text-neutral-900 dark:text-slate-100 text-sm mb-1 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-rose-500" />
+                  سيرفرات وبث Bunny.net
+                </div>
+                <p className="text-neutral-500 dark:text-slate-400 leading-relaxed">
+                  تكامل مكتبات الفيديو السحابية عبر Bunny Stream لحماية المحتوى ومنع التحميل غير المصرح به.
+                </p>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-black/2 dark:bg-white/2 border" style={{ borderColor: colors.borderColor }}>
+                <div className="font-bold text-neutral-900 dark:text-slate-100 text-sm mb-1 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-indigo-500" />
+                  التقارير وسجلات الطلاب
+                </div>
+                <p className="text-neutral-500 dark:text-slate-400 leading-relaxed">
+                  متابعة عمليات الشراء والدفع عبر ميسر/هايبرباي، وتتبع أداء واشتراكات الطلاب بجميع المقررات.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ===================== TAB 1: MY LEARNING ===================== */}
       {activeTab === 'learning' && (
@@ -731,10 +924,8 @@ export default function StudentProfilePage({
               <button
                 type="button"
                 onClick={() => {
-                  if (confirm('هل أنت متأكد من رغبتك في تسجيل الخروج من حسابك؟')) {
-                    if (onLogout) onLogout();
-                    if (onNavigateHome) onNavigateHome();
-                  }
+                  if (onLogout) onLogout();
+                  if (onNavigateHome) onNavigateHome();
                 }}
                 className="w-full py-3 rounded-full font-bold text-xs bg-rose-600 hover:bg-rose-700 text-white shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
               >

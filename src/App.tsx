@@ -107,6 +107,7 @@ export default function App() {
     clearAuthToken();
     setCurrentUser(null);
     setIsDashboardOpen(false);
+    setCurrentRoute({ type: 'home' });
   };
 
   const handleCourseSelect = (course: Course) => {
@@ -186,43 +187,46 @@ export default function App() {
       data-theme={currentTheme}
       dir="rtl"
     >
-      {/* Top Announcement Bar */}
-      <AnnouncementBar currentTheme={currentTheme} />
+      {/* Top Announcement Bar (hidden on admin route) */}
+      {currentRoute.type !== 'admin' && <AnnouncementBar currentTheme={currentTheme} />}
 
-      {/* Floating Vertical Social & Support Sidebar (Fixed on right edge) */}
-      <FloatingSocialSidebar currentTheme={currentTheme} />
+      {/* Floating Vertical Social & Support Sidebar (Fixed on right edge, hidden on admin route) */}
+      {currentRoute.type !== 'admin' && <FloatingSocialSidebar currentTheme={currentTheme} />}
 
-      {/* Sticky Pill Navbar */}
-      <Navbar
-        currentTheme={currentTheme}
-        onToggleTheme={handleToggleTheme}
-        onChangeTheme={handleSelectTheme}
-        currentUser={currentUser}
-        onOpenLogin={handleOpenLogin}
-        onOpenSignup={handleOpenSignup}
-        onOpenAuth={(mode) => {
-          setAuthMode(mode);
-          setIsAuthModalOpen(true);
-        }}
-        onOpenDashboard={() => handleNavigatePage('profile')}
-        onOpenExam={() => setIsExamModalOpen(true)}
-        onOpenAdmin={() => handleNavigatePage('admin')}
-        currentPage={currentRoute.type}
-        onNavigatePage={handleNavigatePage}
-        cartCount={cartItems.length}
-        onNavigateSection={(sectionId) => {
-          if (currentRoute.type !== 'home') {
-            setCurrentRoute({ type: 'home' });
-            setTimeout(() => {
+      {/* Sticky Pill Navbar (hidden on admin route to give clean dedicated admin top bar) */}
+      {currentRoute.type !== 'admin' && (
+        <Navbar
+          currentTheme={currentTheme}
+          onToggleTheme={handleToggleTheme}
+          onChangeTheme={handleSelectTheme}
+          currentUser={currentUser}
+          onOpenLogin={handleOpenLogin}
+          onOpenSignup={handleOpenSignup}
+          onOpenAuth={(mode) => {
+            setAuthMode(mode);
+            setIsAuthModalOpen(true);
+          }}
+          onOpenDashboard={() => handleNavigatePage('profile')}
+          onOpenExam={() => setIsExamModalOpen(true)}
+          onOpenAdmin={() => handleNavigatePage('admin')}
+          currentPage={currentRoute.type}
+          onNavigatePage={handleNavigatePage}
+          onLogout={handleLogout}
+          cartCount={cartItems.length}
+          onNavigateSection={(sectionId) => {
+            if (currentRoute.type !== 'home') {
+              setCurrentRoute({ type: 'home' });
+              setTimeout(() => {
+                const el = document.getElementById(sectionId);
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }, 100);
+            } else {
               const el = document.getElementById(sectionId);
               if (el) el.scrollIntoView({ behavior: 'smooth' });
-            }, 100);
-          } else {
-            const el = document.getElementById(sectionId);
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-          }
-        }}
-      />
+            }
+          }}
+        />
+      )}
 
       {/* ===================== PAGE ROUTING RENDER ===================== */}
       <main className="flex-grow">
@@ -257,6 +261,9 @@ export default function App() {
             currentUser={currentUser}
             onPreviewCourse={(course) => handleCourseSelect(course)}
             onNavigateHome={() => setCurrentRoute({ type: 'home' })}
+            onToggleTheme={handleToggleTheme}
+            onLogout={handleLogout}
+            onNavigateProfile={() => setCurrentRoute({ type: 'profile' })}
           />
         )}
 
@@ -267,14 +274,11 @@ export default function App() {
             currentTheme={currentTheme}
             onOpenWatchLesson={(lessonId, courseId) => setWatchingLesson({ lessonId, courseId })}
             onOpenCourseDetail={(course) => handleCourseSelect(course)}
-            onNavigateHome={() => setCurrentRoute({ type: 'home' })}
+            onNavigateHome={() => setCurrentRoute({ type: currentUser?.role === 'admin' ? 'admin' : 'home' })}
             onUpdateUser={(updated) => {
               if (currentUser) setCurrentUser({ ...currentUser, ...updated });
             }}
-            onLogout={() => {
-              setCurrentUser(null);
-              clearAuthToken();
-            }}
+            onLogout={handleLogout}
           />
         )}
 
