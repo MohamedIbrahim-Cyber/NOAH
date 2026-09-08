@@ -1,0 +1,6 @@
+{
+  "name": "نوح أكاديمي - Nohe Academy",
+  "description": "منصة نوح التعليمية لطلاب المرحلة الثانوية والمسارات في المملكة العربية السعودية، تجمع نخبة من أفضل المعلمين.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
